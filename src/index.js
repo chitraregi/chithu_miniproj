@@ -1,17 +1,49 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useEffect } from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
+import App from './App'
+import 'antd/dist/antd.css'
+import Login from './components/login.component'
+import Register from './components/register.component'
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  useHistory,
+} from 'react-router-dom'
+
+import firebase from './firebase'
+
+//store for storing and accessing variables in redux
+
+const Root = () => {
+  const history = useHistory({}) // hook for handling the history
+  useEffect(() => {
+    const set = async () => {
+      await firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          history.push('/')
+        } else {
+          history.push('/login')
+        }
+      })
+    }
+    set()
+    //eslint-disable-next-line
+  }, [])
+
+  return (
+    <Switch>
+      <Route exact path='/' component={App} />
+      <Route path='/login' component={Login} />
+      <Route path='/register' component={Register} />
+    </Switch>
+  )
+}
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Router>
+    <Root />
+  </Router>,
   document.getElementById('root')
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+)
